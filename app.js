@@ -18,7 +18,7 @@ function openPasswordDialog(network){
  selectedNetwork=network;
  const secure=!/^(OPEN|NONE)$/i.test(network.security||"");
  $("passwordTitle").textContent="Connect to "+network.name;
- $("passwordHint").textContent=secure?"Enter the password for this network. It is used only for this connection request.":"This is an open network. Android will still ask you to approve the connection.";
+ $("passwordHint").textContent=secure?"Enter the network password. You can optionally save it encrypted on this device for next time.":"This is an open network. Android will still ask you to approve the connection.";
  $("wifiPassword").hidden=!secure;
  $("wifiPassword").value="";
  $("saveWifiPassword").checked=false;
