@@ -1,11 +1,11 @@
-const CACHE="wifi-phantom-v5";
+const CACHE="wifi-phantom-v6";
 const FILES=[
   "./",
   "./index.html",
-  "./style.css?v=5",
-  "./app.js?v=5",
-  "./manifest.webmanifest?v=5",
-  "./icon.svg?v=5"
+  "./style.css?v=6",
+  "./app.js?v=6",
+  "./manifest.webmanifest?v=6",
+  "./icon.svg?v=6"
 ];
 
 self.addEventListener("install",event=>{
