@@ -1,22 +1,38 @@
 # WIFI PHANTOM
 
-A mobile-friendly PWA with a dark terminal-inspired interface, sample Wi-Fi observations, Android Wi-Fi settings shortcuts, a router dashboard shortcut, and a harmless terminal simulation.
+WIFI PHANTOM is a mobile-friendly Wi-Fi awareness website plus an Android WebView companion app with native Wi-Fi scanning.
 
-Live site: https://dreamerthatdeath.github.io/WIFI-PHANTOM/
+Website: https://dreamerthatdeath.github.io/WIFI-PHANTOM/
 
-## Browser limitation
-A normal website cannot scan nearby Wi-Fi radios, retrieve saved Wi-Fi passwords, bypass authentication, or change router credentials. The radar uses clearly labelled sample data. Connect through Android Wi-Fi settings using credentials you are authorized to use.
+## Android APK
 
-## Features
-- Responsive dark green dashboard.
-- Clearly labelled sample network radar.
-- Safe Phantom terminal simulation. It sends no packets and contacts no devices.
-- Android Wi-Fi settings shortcut.
-- Router admin shortcut at 192.168.1.1 (your router address may differ).
-- Home Wi-Fi security checklist.
-- Installable PWA and offline app shell.
+The Android project is in `android/`. It loads the hosted website and exposes a small native bridge for live Wi-Fi scan results and Android settings shortcuts.
 
-## GitHub Pages
-In repository Settings, open Pages. Choose Deploy from a branch, select main and the root folder, then save.
+### Build an APK with GitHub Actions
+1. Open the repository's **Actions** tab.
+2. Select **Build WIFI PHANTOM APK**.
+3. Choose **Run workflow** (or wait for a build after an Android project change).
+4. Open the completed run and download the `WIFI-PHANTOM-debug-apk` artifact.
+5. Extract the ZIP and install `app-debug.apk` on your Android phone. Allow installation from the browser/file manager when Android asks.
 
-Use this project only for learning and managing networks you own or are authorized to use. It does not bypass passwords, attack access points, disconnect devices, or interfere with networks.
+The debug APK is for testing. A release APK for public distribution should be signed with a private signing key.
+
+## Native Wi-Fi scanning
+- Requests Android Location and Nearby Wi-Fi permissions when the user starts a scan.
+- Requires Wi-Fi to be enabled and Android Location services to be on for scan results.
+- Shows nearby SSID names, signal strength, frequency, and security type.
+- Android may throttle scans; when that happens, the app displays the latest cached scan results.
+- Android versions and device manufacturers can restrict scan frequency or hide some network names.
+
+## Connection and router controls
+- The app opens Android's own Wi-Fi settings so the user can select a network and enter credentials.
+- It can open a private local router address in the browser. Router administration still requires the router's valid administrator login.
+- It does not bypass Wi-Fi passwords, router logins, or other access controls.
+
+## Website-only behavior
+A normal website cannot scan nearby Wi-Fi radios. Outside the Android companion app, the radar remains clearly labelled demo data. The terminal is a harmless visual simulation and sends no packets.
+
+## Build details
+- Android application ID: `com.dreamerthatdeath.wifiphantom`
+- Java 17, Android Gradle Plugin 8.7.3, Gradle 8.9
+- Minimum Android version: Android 6.0 (API 23)
