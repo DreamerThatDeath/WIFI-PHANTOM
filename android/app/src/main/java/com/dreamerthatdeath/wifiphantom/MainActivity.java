@@ -290,18 +290,22 @@ public class MainActivity extends Activity {
                 @Override
                 public void onAvailable(Network network) {
                     appRequestedNetwork = true;
+                    // Route this app's traffic through the requested Wi-Fi network only.
+                    if (connectivityManager != null) connectivityManager.bindProcessToNetwork(network);
                     sendConnectionStatus("available", "Android approved the Wi-Fi connection request.");
                 }
 
                 @Override
                 public void onUnavailable() {
                     appRequestedNetwork = false;
+                    if (connectivityManager != null) connectivityManager.bindProcessToNetwork(null);
                     sendConnectionStatus("unavailable", "Android could not connect. Check the password or approve the system prompt.");
                 }
 
                 @Override
                 public void onLost(Network network) {
                     appRequestedNetwork = false;
+                    if (connectivityManager != null) connectivityManager.bindProcessToNetwork(null);
                     sendConnectionStatus("lost", "The requested Wi-Fi network is no longer available.");
                 }
             };
@@ -322,6 +326,9 @@ public class MainActivity extends Activity {
             wifiNetworkCallback = null;
         }
         appRequestedNetwork = false;
+        if (connectivityManager != null) {
+            try { connectivityManager.bindProcessToNetwork(null); } catch (Exception ignored) { }
+        }
         if (notifyPage) sendConnectionStatus("disconnected", "WIFI PHANTOM released its network request.");
     }
 
