@@ -16,3 +16,7 @@
 .modal-card input:focus{border-color:var(--green)}
 .modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
 @media(max-width:420px){.radar-actions button{flex:1}.network-row{gap:8px}.network-name{overflow-wrap:anywhere}}
+
+.save-row{display:flex!important;align-items:center;gap:9px;margin:12px 0!important;color:#a3b9aa!important;font:10px var(--mono)!important;letter-spacing:0!important}
+.save-row input{width:16px;height:16px;accent-color:var(--green)}
+.saved-password{width:100%;margin-top:8px;padding:10px;background:#102719;color:var(--green);border:1px solid #31503c;border-radius:5px;font:bold 9px var(--mono)}
