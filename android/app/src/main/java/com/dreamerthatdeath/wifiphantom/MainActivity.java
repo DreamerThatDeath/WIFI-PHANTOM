@@ -176,7 +176,7 @@ public class MainActivity extends Activity {
                 JSONObject item = new JSONObject();
                 item.put("name", result.SSID);
                 item.put("signalDbm", result.level);
-                item.put("signalPercent", Math.max(0, Math.min(100, WifiManager.calculateSignalLevel(result.level, 101))));
+                item.put("signalPercent", Math.max(0, Math.min(100, ((result.level + 100) * 2))));
                 item.put("frequency", result.frequency);
                 item.put("security", securityFor(result.capabilities));
                 networks.put(item);
