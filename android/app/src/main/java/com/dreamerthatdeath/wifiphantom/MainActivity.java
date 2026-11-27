@@ -9,6 +9,11 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
+import android.net.wifi.WifiNetworkSpecifier;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -35,6 +40,9 @@ public class MainActivity extends Activity {
     private WifiManager wifiManager;
     private BroadcastReceiver scanReceiver;
     private boolean receiverRegistered = false;
+    private ConnectivityManager connectivityManager;
+    private ConnectivityManager.NetworkCallback wifiNetworkCallback;
+    private boolean appRequestedNetwork = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +51,7 @@ public class MainActivity extends Activity {
         getWindow().setNavigationBarColor(0xFF07120D);
 
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         webView = new WebView(this);
         webView.setBackgroundColor(0xFF07120D);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -220,6 +229,119 @@ public class MainActivity extends Activity {
         });
     }
 
+    private void sendConnectionStatus(String status, String message) {
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put("status", status);
+            if (message != null) payload.put("message", message);
+        } catch (Exception ignored) { }
+        String json = payload.toString();
+        runOnUiThread(() -> {
+            if (webView == null) return;
+            webView.evaluateJavascript("if(window.onNativeWifiConnectionStatus){window.onNativeWifiConnectionStatus(" + JSONObject.quote(json) + ");}", null);
+        });
+    }
+
+    private void requestWifiConnection(String ssid, String password, String security) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            sendConnectionStatus("unsupported", "This Android version needs the system Wi-Fi settings to connect.");
+            runOnUiThread(() -> openWifiSettings());
+            return;
+        }
+        if (ssid == null || ssid.trim().isEmpty() || ssid.length() > 32) {
+            sendConnectionStatus("error", "Invalid Wi-Fi network name.");
+            return;
+        }
+        String kind = security == null ? "WPA2" : security.toUpperCase();
+        try {
+            WifiNetworkSpecifier.Builder specifierBuilder = new WifiNetworkSpecifier.Builder().setSsid(ssid);
+            if ("OPEN".equals(kind) || "NONE".equals(kind)) {
+                // Open networks need no passphrase; Android still displays its approval UI.
+            } else if (kind.contains("WPA3")) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    if (password == null || password.length() < 1 || password.length() > 63) {
+                        sendConnectionStatus("error", "Enter the correct Wi-Fi password.");
+                        return;
+                    }
+                    specifierBuilder.setWpa3Passphrase(password);
+                } else {
+                    sendConnectionStatus("unsupported", "WPA3 connection is not supported on this Android version.");
+                    return;
+                }
+            } else if (kind.contains("WPA2") || kind.equals("WPA")) {
+                if (password == null || password.length() < 8 || password.length() > 63) {
+                    sendConnectionStatus("error", "Wi-Fi passwords must be 8 to 63 characters.");
+                    return;
+                }
+                specifierBuilder.setWpa2Passphrase(password);
+            } else {
+                sendConnectionStatus("unsupported", "This security type is not supported by the in-app connector. Use Android Wi-Fi settings.");
+                runOnUiThread(() -> openWifiSettings());
+                return;
+            }
+
+            releaseRequestedNetwork(false);
+            WifiNetworkSpecifier specifier = specifierBuilder.build();
+            NetworkRequest request = new NetworkRequest.Builder()
+                    .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                    .setNetworkSpecifier(specifier)
+                    .build();
+            wifiNetworkCallback = new ConnectivityManager.NetworkCallback() {
+                @Override
+                public void onAvailable(Network network) {
+                    appRequestedNetwork = true;
+                    sendConnectionStatus("available", "Android approved the Wi-Fi connection request.");
+                }
+
+                @Override
+                public void onUnavailable() {
+                    appRequestedNetwork = false;
+                    sendConnectionStatus("unavailable", "Android could not connect. Check the password or approve the system prompt.");
+                }
+
+                @Override
+                public void onLost(Network network) {
+                    appRequestedNetwork = false;
+                    sendConnectionStatus("lost", "The requested Wi-Fi network is no longer available.");
+                }
+            };
+            connectivityManager.requestNetwork(request, wifiNetworkCallback);
+            sendConnectionStatus("requesting", "Waiting for Android's network approval.");
+        } catch (SecurityException e) {
+            sendConnectionStatus("error", "Android denied the connection request. Check app permissions and try again.");
+        } catch (IllegalArgumentException e) {
+            sendConnectionStatus("error", "The Wi-Fi details were not accepted by Android.");
+        } catch (Exception e) {
+            sendConnectionStatus("error", "Could not start the Wi-Fi connection request.");
+        }
+    }
+
+    private void releaseRequestedNetwork(boolean notifyPage) {
+        if (connectivityManager != null && wifiNetworkCallback != null) {
+            try { connectivityManager.unregisterNetworkCallback(wifiNetworkCallback); } catch (Exception ignored) { }
+            wifiNetworkCallback = null;
+        }
+        appRequestedNetwork = false;
+        if (notifyPage) sendConnectionStatus("disconnected", "WIFI PHANTOM released its network request.");
+    }
+
+    private void disconnectWifiRequest() {
+        if (wifiNetworkCallback != null) {
+            releaseRequestedNetwork(true);
+        } else {
+            sendConnectionStatus("disconnected", "No WIFI PHANTOM connection request is active. Opening Android Wi-Fi settings.");
+            runOnUiThread(() -> openWifiSettings());
+        }
+    }
+
+    private void openWifiSettings() {
+        try {
+            startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+        } catch (Exception e) {
+            Toast.makeText(this, "Could not open Wi-Fi settings.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private class WifiBridge {
         @JavascriptInterface
         public void scanWifi() {
@@ -228,13 +350,17 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void openWifiSettings() {
-            runOnUiThread(() -> {
-                try {
-                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-                } catch (Exception e) {
-                    Toast.makeText(MainActivity.this, "Could not open Wi-Fi settings.", Toast.LENGTH_SHORT).show();
-                }
-            });
+            runOnUiThread(() -> MainActivity.this.openWifiSettings());
+        }
+
+        @JavascriptInterface
+        public void connectWifi(String ssid, String password, String security) {
+            runOnUiThread(() -> requestWifiConnection(ssid, password, security));
+        }
+
+        @JavascriptInterface
+        public void disconnectWifi() {
+            runOnUiThread(() -> disconnectWifiRequest());
         }
 
         @JavascriptInterface
@@ -271,6 +397,7 @@ public class MainActivity extends Activity {
         if (receiverRegistered && scanReceiver != null) {
             try { unregisterReceiver(scanReceiver); } catch (Exception ignored) { }
         }
+        releaseRequestedNetwork(false);
         if (webView != null) {
             webView.removeJavascriptInterface("AndroidWifi");
             webView.destroy();
