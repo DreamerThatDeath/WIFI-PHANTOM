@@ -32,6 +32,17 @@ import org.json.JSONObject;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
+import java.security.MessageDigest;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+import android.util.Base64;
+import android.content.SharedPreferences;
 
 public class MainActivity extends Activity {
     private static final int WIFI_PERMISSION_REQUEST = 41;
@@ -43,6 +54,8 @@ public class MainActivity extends Activity {
     private ConnectivityManager connectivityManager;
     private ConnectivityManager.NetworkCallback wifiNetworkCallback;
     private boolean appRequestedNetwork = false;
+    private static final String WIFI_KEY_ALIAS = "WIFI_PHANTOM_WIFI_CREDENTIALS";
+    private static final String WIFI_PREFS = "wifi_phantom_saved_networks";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,6 +255,70 @@ public class MainActivity extends Activity {
         });
     }
 
+    private SharedPreferences wifiPrefs() {
+        return getSharedPreferences(WIFI_PREFS, MODE_PRIVATE);
+    }
+
+    private String credentialKey(String ssid) throws Exception {
+        byte[] digest = MessageDigest.getInstance("SHA-256").digest(ssid.getBytes(StandardCharsets.UTF_8));
+        return "network_" + Base64.encodeToString(digest, Base64.NO_WRAP | Base64.URL_SAFE);
+    }
+
+    private SecretKey getOrCreateCredentialKey() throws Exception {
+        KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
+        keyStore.load(null);
+        if (keyStore.containsAlias(WIFI_KEY_ALIAS)) {
+            return ((KeyStore.SecretKeyEntry) keyStore.getEntry(WIFI_KEY_ALIAS, null)).getSecretKey();
+        }
+        KeyGenerator generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+        generator.init(new KeyGenParameterSpec.Builder(WIFI_KEY_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setRandomizedEncryptionRequired(true)
+                .build());
+        return generator.generateKey();
+    }
+
+    private boolean saveWifiCredential(String ssid, String password) {
+        if (ssid == null || ssid.trim().isEmpty() || password == null || password.length() < 8 || password.length() > 63) return false;
+        try {
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.ENCRYPT_MODE, getOrCreateCredentialKey());
+            byte[] encrypted = cipher.doFinal(password.getBytes(StandardCharsets.UTF_8));
+            byte[] iv = cipher.getIV();
+            byte[] combined = new byte[iv.length + encrypted.length];
+            System.arraycopy(iv, 0, combined, 0, iv.length);
+            System.arraycopy(encrypted, 0, combined, iv.length, encrypted.length);
+            return wifiPrefs().edit().putString(credentialKey(ssid), Base64.encodeToString(combined, Base64.NO_WRAP)).commit();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private String readWifiCredential(String ssid) {
+        try {
+            String stored = wifiPrefs().getString(credentialKey(ssid), null);
+            if (stored == null) return null;
+            byte[] combined = Base64.decode(stored, Base64.NO_WRAP);
+            if (combined.length < 13) return null;
+            byte[] iv = new byte[12];
+            byte[] encrypted = new byte[combined.length - 12];
+            System.arraycopy(combined, 0, iv, 0, 12);
+            System.arraycopy(combined, 12, encrypted, 0, encrypted.length);
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, getOrCreateCredentialKey(), new GCMParameterSpec(128, iv));
+            return new String(cipher.doFinal(encrypted), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private boolean hasSavedWifiCredential(String ssid) {
+        try { return wifiPrefs().contains(credentialKey(ssid)); }
+        catch (Exception e) { return false; }
+    }
+
     private void requestWifiConnection(String ssid, String password, String security) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             sendConnectionStatus("unsupported", "This Android version needs the system Wi-Fi settings to connect.");
@@ -259,7 +336,7 @@ public class MainActivity extends Activity {
                 // Open networks need no passphrase; Android still displays its approval UI.
             } else if (kind.contains("WPA3")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    if (password == null || password.length() < 1 || password.length() > 63) {
+                    if (password == null || password.length() < 8 || password.length() > 63) {
                         sendConnectionStatus("error", "Enter the correct Wi-Fi password.");
                         return;
                     }
@@ -363,6 +440,28 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void connectWifi(String ssid, String password, String security) {
             runOnUiThread(() -> requestWifiConnection(ssid, password, security));
+        }
+
+        @JavascriptInterface
+        public boolean saveWifiPassword(String ssid, String password) {
+            return saveWifiCredential(ssid, password);
+        }
+
+        @JavascriptInterface
+        public boolean hasSavedWifiPassword(String ssid) {
+            return hasSavedWifiCredential(ssid);
+        }
+
+        @JavascriptInterface
+        public void connectSavedWifi(String ssid, String security) {
+            runOnUiThread(() -> {
+                String saved = readWifiCredential(ssid);
+                if (saved == null) {
+                    sendConnectionStatus("error", "No saved password was found. Enter it again.");
+                    return;
+                }
+                requestWifiConnection(ssid, saved, security);
+            });
         }
 
         @JavascriptInterface
