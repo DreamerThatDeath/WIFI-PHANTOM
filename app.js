@@ -21,6 +21,12 @@ function openPasswordDialog(network){
  $("passwordHint").textContent=secure?"Enter the password for this network. It is used only for this connection request.":"This is an open network. Android will still ask you to approve the connection.";
  $("wifiPassword").hidden=!secure;
  $("wifiPassword").value="";
+ $("saveWifiPassword").checked=false;
+ $("saveWifiPassword").parentElement.hidden=!secure;
+ $("useSavedPassword").hidden=true;
+ if(secure&&isNative()&&window.AndroidWifi.hasSavedWifiPassword){
+  $("useSavedPassword").hidden=!window.AndroidWifi.hasSavedWifiPassword(network.name);
+ }
  $("passwordModal").hidden=false;
  if(secure)$("wifiPassword").focus();
 }
@@ -30,9 +36,14 @@ function connectSelected(){
  const network=selectedNetwork;
  const secure=!/^(OPEN|NONE)$/i.test(network.security||"");
  const password=$("wifiPassword").value;
- if(secure&&password.length<8){toast("Enter a valid Wi-Fi password (at least 8 characters).");return}
+ if(secure&& (password.length<8 || password.length>63)){toast("Enter a Wi-Fi password between 8 and 63 characters.");return}
  if(!isNative()){toast("Real Wi-Fi connection is available in the Android app. Use Wi-Fi settings on the website.");closePasswordDialog();return}
  if(!window.AndroidWifi.connectWifi){toast("Update the Android app to enable Wi-Fi connection.");return}
+ if(secure&&$("saveWifiPassword").checked){
+  if(!window.AndroidWifi.saveWifiPassword||!window.AndroidWifi.saveWifiPassword(network.name,password)){
+   toast("Could not securely save this password. Connection was not started.");return;
+  }
+ }
  closePasswordDialog();
  $("systemStatus").textContent="REQUESTING CONNECTION";
  log("[CONNECT] Requesting Android-approved connection to "+network.name+".");
@@ -102,6 +113,7 @@ window.onNativeWifiConnectionStatus=function(raw){
  else if(result.status==="lost"){nativeConnected=false;$("systemStatus").textContent="WI-FI CONNECTION LOST";log("[NOTICE] The requested Wi-Fi connection was lost.");toast("Wi-Fi connection lost.");}
  else if(result.status==="disconnected"){activeNativeRequest=false;nativeConnected=false;$("systemStatus").textContent="SYSTEM READY";log("[DISCONNECT] WIFI PHANTOM released its Wi-Fi request.");toast("WIFI PHANTOM connection released.");}
  else if(result.status==="unsupported"){toast(result.message||"Use Android Wi-Fi settings for this network.");}
+ else if(result.status==="error"){toast(result.message||"Wi-Fi connection failed.");}
 };
 async function phantom(){
  const b=$("phantomBtn");b.disabled=true;b.textContent="SIMULATION RUNNING…";$("phantomStatus").textContent="ACTIVE";$("phantomStatus").classList.add("green");
@@ -115,6 +127,13 @@ $("openSettings").onclick=wifi;
 $("disconnectBtn").onclick=disconnectWifi;
 $("passwordForm").onsubmit=e=>{e.preventDefault();connectSelected()};
 $("cancelConnect").onclick=closePasswordDialog;
+$("useSavedPassword").onclick=()=>{
+ if(!selectedNetwork||!isNative()||!window.AndroidWifi.connectSavedWifi)return;
+ const n=selectedNetwork;closePasswordDialog();
+ $("systemStatus").textContent="REQUESTING CONNECTION";
+ log("[CONNECT] Using the saved credential for "+n.name+".");
+ window.AndroidWifi.connectSavedWifi(n.name,n.security);
+};
 $("passwordModal").onclick=e=>{if(e.target===$("passwordModal"))closePasswordDialog()};
 $("phantomBtn").onclick=phantom;
 $("clearBtn").onclick=()=>$("terminal").innerHTML='<div class="muted">Console cleared. Simulation only.</div><div>root@phantom:~$ <i class="cursor"></i></div>';
