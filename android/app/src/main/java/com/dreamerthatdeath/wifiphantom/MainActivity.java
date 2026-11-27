@@ -100,7 +100,7 @@ public class MainActivity extends Activity {
         };
         IntentFilter filter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
         if (Build.VERSION.SDK_INT >= 33) {
-            registerReceiver(scanReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+            registerReceiver(scanReceiver, filter, Context.RECEIVER_EXPORTED);
         } else {
             registerReceiver(scanReceiver, filter);
         }
