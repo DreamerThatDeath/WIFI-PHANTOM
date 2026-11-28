@@ -145,11 +145,17 @@ $("routerBtn").onclick=()=>{
 };
 $("securityBtn").onclick=()=>$("checklist").scrollIntoView({behavior:"smooth"});
 let installEvent;
-addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvent=e;$("installBtn").hidden=false});
-$("installBtn").onclick=async()=>{
- if(!installEvent){toast("Open your browser menu and choose Add to Home screen.");return}
- installEvent.prompt();await installEvent.userChoice;installEvent=null;$("installBtn").hidden=true;
-};
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvent=e;$("installBtn").hidden=false;$("installPwaBtn").hidden=false});
+async function promptWebInstall(){
+ if(!installEvent){toast("Use your browser menu and choose Install app or Add to Home screen.");return}
+ installEvent.prompt();
+ await installEvent.userChoice;
+ installEvent=null;
+ $("installBtn").hidden=true;
+ $("installPwaBtn").hidden=true;
+}
+$("installBtn").onclick=promptWebInstall;
+$("installPwaBtn").onclick=promptWebInstall;
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 if(isNative()){
  $("scanBtn").textContent="⌕ SCAN WI-FI";
@@ -159,3 +165,5 @@ if(isNative()){
 } else {
  $("scanBtn").textContent="⌕ RUN DEMO SCAN";
 }
+
+if(isNative()&&$("installCard"))$("installCard").hidden=true;
