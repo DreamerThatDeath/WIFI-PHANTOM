@@ -43,8 +43,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          cp "$APK" WIFI-PHANTOM.apk
           if gh release view wifi-phantom-latest >/dev/null 2>&1; then
-            gh release upload wifi-phantom-latest "$APK#WIFI-PHANTOM.apk" --clobber
+            gh release upload wifi-phantom-latest WIFI-PHANTOM.apk --clobber
           else
-            gh release create wifi-phantom-latest "$APK#WIFI-PHANTOM.apk" --title "WIFI PHANTOM latest APK" --notes "Latest automatically built WIFI PHANTOM Android APK. Android will require you to approve Wi-Fi connection requests."
+            gh release create wifi-phantom-latest WIFI-PHANTOM.apk --title "WIFI PHANTOM latest APK" --notes "Latest automatically built WIFI PHANTOM Android APK. Android will require you to approve Wi-Fi connection requests."
           fi
