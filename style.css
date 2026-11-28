@@ -20,3 +20,12 @@
 .save-row{display:flex!important;align-items:center;gap:9px;margin:12px 0!important;color:#a3b9aa!important;font:10px var(--mono)!important;letter-spacing:0!important}
 .save-row input{width:16px;height:16px;accent-color:var(--green)}
 .saved-password{width:100%;margin-top:8px;padding:10px;background:#102719;color:var(--green);border:1px solid #31503c;border-radius:5px;font:bold 9px var(--mono)}
+
+.install-card{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:18px;margin:6px 0 25px;padding:20px;background:linear-gradient(120deg,#0d2116,#09150e);border:1px solid #2b6040;border-radius:10px;box-shadow:0 12px 40px #0003}
+.install-logo{width:68px;height:68px;border-radius:16px;border:1px solid var(--green);box-shadow:0 0 24px #35d07f22}
+.install-copy{min-width:0}.install-kicker{font:9px var(--mono);letter-spacing:1.4px;color:var(--green)}
+.install-copy h2{font-size:21px;margin:6px 0}.install-copy p{font-size:11px;line-height:1.6;color:#a3b9aa;margin:0;max-width:650px}
+.install-actions{grid-column:2;display:flex;gap:9px;flex-wrap:wrap}
+.install-link{display:inline-flex;align-items:center;text-decoration:none}
+.install-foot{grid-column:2;color:var(--muted);font:9px/1.6 var(--mono)}
+@media(max-width:600px){.install-card{grid-template-columns:54px 1fr;gap:12px;padding:14px}.install-logo{width:52px;height:52px}.install-copy h2{font-size:17px}.install-copy p{font-size:10px}.install-actions,.install-foot{grid-column:1/-1}.install-actions>*{flex:1;justify-content:center;text-align:center}}
