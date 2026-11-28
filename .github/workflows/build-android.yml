@@ -1,4 +1,4 @@
-name: Build WIFI PHANTOM APK
+name: Build and publish WIFI PHANTOM APK
 
 on:
   workflow_dispatch:
@@ -6,6 +6,9 @@ on:
     paths:
       - "android/**"
       - ".github/workflows/build-android.yml"
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -28,9 +31,20 @@ jobs:
       - name: Build debug APK
         run: gradle -p android assembleDebug
 
-      - name: Upload APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: WIFI-PHANTOM-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Publish latest APK download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          if gh release view wifi-phantom-latest >/dev/null 2>&1; then
+            gh release upload wifi-phantom-latest "$APK#WIFI-PHANTOM.apk" --clobber
+          else
+            gh release create wifi-phantom-latest "$APK#WIFI-PHANTOM.apk" --title "WIFI PHANTOM latest APK" --notes "Latest automatically built WIFI PHANTOM Android APK. Android will require you to approve Wi-Fi connection requests."
+          fi
