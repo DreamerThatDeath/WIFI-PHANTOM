@@ -27,6 +27,7 @@ function openPasswordDialog(network){
  if(secure&&isNative()&&window.AndroidWifi.hasSavedWifiPassword){
   $("useSavedPassword").hidden=!window.AndroidWifi.hasSavedWifiPassword(network.name);
  }
+ $("confirmConnect").textContent=secure?"CONNECT":"CONNECT WITHOUT PASSWORD";
  $("passwordModal").hidden=false;
  if(secure)$("wifiPassword").focus();
 }
@@ -73,7 +74,8 @@ function renderNetworks(networks,source){
   const right=document.createElement("div");right.className="network-row-right";
   const signal=document.createElement("div");signal.className="signal";signal.textContent=source==="live"?"LIVE":"DEMO";
   const strength=document.createElement("div");strength.className="network-meta";strength.textContent=n.strength+"% signal";
-  const connect=document.createElement("button");connect.className="network-connect";connect.type="button";connect.textContent="CONNECT";
+  const isOpen=/^(OPEN|NONE)$/i.test(n.security||"");
+  const connect=document.createElement("button");connect.className="network-connect";connect.type="button";connect.textContent=isOpen?"CONNECT · NO PASSWORD":"CONNECT";
   connect.disabled=source!=="live"||!isNative();
   connect.title=connect.disabled?"Live connection requires the Android app":"Connect to "+n.name;
   connect.onclick=()=>openPasswordDialog(n);
@@ -144,18 +146,6 @@ $("routerBtn").onclick=()=>{
  window.open(url,"_blank","noopener");
 };
 $("securityBtn").onclick=()=>$("checklist").scrollIntoView({behavior:"smooth"});
-let installEvent;
-addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvent=e;$("installBtn").hidden=false;$("installPwaBtn").hidden=false});
-async function promptWebInstall(){
- if(!installEvent){toast("Use your browser menu and choose Install app or Add to Home screen.");return}
- installEvent.prompt();
- await installEvent.userChoice;
- installEvent=null;
- $("installBtn").hidden=true;
- $("installPwaBtn").hidden=true;
-}
-$("installBtn").onclick=promptWebInstall;
-$("installPwaBtn").onclick=promptWebInstall;
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
 if(isNative()){
  $("scanBtn").textContent="⌕ SCAN WI-FI";
