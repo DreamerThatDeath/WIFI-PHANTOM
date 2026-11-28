@@ -1,13 +1,13 @@
 {
   "name": "WIFI PHANTOM",
   "short_name": "PHANTOM",
-  "description": "Wi-Fi awareness dashboard and safe Android network controls",
+  "description": "WIFI PHANTOM Android Wi-Fi scanner and network tools",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#07120d",
   "theme_color": "#07120d",
   "icons": [
-    {"src": "./icon.svg?v=7", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+    {"src": "./icon.svg?v=8", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
   ]
 }
