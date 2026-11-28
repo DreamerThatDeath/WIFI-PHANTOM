@@ -4,69 +4,50 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07120d">
-<meta name="description" content="WIFI PHANTOM Android Wi-Fi scanner and connection console.">
-<link rel="manifest" href="./manifest.webmanifest?v=7">
-<link rel="icon" href="./icon.svg?v=7">
-<link rel="apple-touch-icon" href="./icon.svg">
-<link rel="stylesheet" href="./style.css?v=7">
-<title>WIFI PHANTOM</title>
+<meta name="description" content="WIFI PHANTOM. A compact Android Wi-Fi scanning and network management app.">
+<meta property="og:title" content="WIFI PHANTOM">
+<meta property="og:description" content="Scan nearby Wi-Fi networks and manage approved connections from Android.">
+<meta property="og:image" content="https://dreamerthatdeath.github.io/WIFI-PHANTOM/icon.svg">
+<link rel="manifest" href="./manifest.webmanifest?v=8">
+<link rel="icon" href="./icon.svg?v=8" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg?v=8">
+<link rel="stylesheet" href="./style.css?v=8">
+<title>WIFI PHANTOM | Android App</title>
 </head>
-<body>
-<header class="topbar">
-  <a class="brand" href="./"><img class="app-icon" src="./icon.svg?v=7" alt="WIFI PHANTOM app icon"><span>WIFI<span class="green">PHANTOM</span><small>WIRELESS CONTROL INTERFACE</small></span></a>
-  <div class="status"><i></i><span id="systemStatus">SYSTEM READY</span><button id="installBtn" hidden>INSTALL WEB APP</button></div>
+<body class="download-page">
+<header class="download-header">
+<a class="download-brand" href="./"><img src="./icon.svg?v=8" alt="WIFI PHANTOM icon"><span>WIFI <b>PHANTOM</b></span></a>
+<span class="download-version">ANDROID APPLICATION</span>
 </header>
-<main class="shell">
-<section class="hero">
-  <div class="eyebrow">◉ PERSONAL NETWORK CONSOLE</div>
-  <h1>SEE THE <b>SIGNAL.</b><br>OWN YOUR SPACE.</h1>
-  <p>Scan nearby wireless networks, request connections through Android, and manage your own network tools from one compact console.</p>
-  <div class="actions"><button class="secondary" id="wifiBtn">OPEN WI-FI SETTINGS ↗</button></div>
-  <div class="notice">ⓘ <span><b>Choose the right version:</b> The website preview uses demo scan data. Install the Android APK for live Wi-Fi scanning and Android-approved connection controls. Websites cannot directly scan Wi-Fi radios.</span></div>
+<main class="download-main">
+<section class="download-hero">
+<div class="download-icon-wrap"><img src="./icon.svg?v=8" alt="WIFI PHANTOM app icon"></div>
+<div class="download-label">WIRELESS CONTROL · ANDROID</div>
+<h1>WIFI <span>PHANTOM</span></h1>
+<p class="download-tagline">Your wireless network. Your control panel.</p>
+<p class="download-description">Discover nearby Wi-Fi networks, check signal and security details, and request connections through Android's built-in approval system.</p>
+<a class="download-button" href="https://github.com/DreamerThatDeath/WIFI-PHANTOM/releases/latest/download/WIFI-PHANTOM.apk"><span class="download-symbol">↓</span><span>DOWNLOAD FOR ANDROID<small>APK · Latest available build</small></span></a>
+<div class="download-meta"><span>◈ ANDROID APK</span><span>◈ FREE TO INSTALL</span><span>◈ WIFI PHANTOM</span></div>
 </section>
-<section class="install-card" id="installCard">
-  <img src="./icon.svg?v=7" alt="WIFI PHANTOM app logo" class="install-logo">
-  <div class="install-copy"><span class="install-kicker">ANDROID APP · VERSION LATEST</span><h2>Take PHANTOM with you.</h2><p>Install the Android app to use live network scanning, password entry, optional encrypted password saving, connect requests, and disconnect controls.</p></div>
-  <div class="install-actions">
-    <a class="primary install-link" href="https://github.com/DreamerThatDeath/WIFI-PHANTOM/releases/latest/download/WIFI-PHANTOM.apk">↓ DOWNLOAD ANDROID APK</a>
-    <button class="secondary" id="installPwaBtn" hidden>＋ INSTALL WEB APP</button>
-  </div>
-  <small class="install-foot">Android will ask you to approve connections. Only connect to networks you own or have permission to use.</small>
+<section class="feature-section">
+<div class="section-kicker">BUILT FOR YOUR DEVICE</div>
+<h2>Small app. Useful tools.</h2>
+<div class="feature-grid">
+<article class="feature"><span>⌕</span><h3>Wi-Fi scanner</h3><p>View nearby network names, signal levels, and security types on supported Android devices.</p></article>
+<article class="feature"><span>⌁</span><h3>Connection controls</h3><p>Enter a network password and approve the connection using Android's system prompt.</p></article>
+<article class="feature"><span>▣</span><h3>Local password saving</h3><p>Optionally save credentials encrypted on your device for networks you are allowed to use.</p></article>
+</div>
 </section>
-<section class="stats">
-  <article><small>VISIBLE NETWORKS</small><strong id="networkCount">--</strong><label>LIVE APP / DEMO WEB</label></article>
-  <article><small>SECURITY CHECK</small><strong class="green">READY</strong><label>LOCAL EDUCATIONAL VIEW</label></article>
-  <article><small>PHANTOM MODE</small><strong id="phantomStatus">OFFLINE</strong><label>VISUAL SIMULATION ONLY</label></article>
+<section class="install-help">
+<div><div class="section-kicker">GETTING STARTED</div><h2>Install in a few taps.</h2><p>Download the APK, open the downloaded file, and follow Android's installation prompts. You may need to allow your browser to install apps from that source.</p></div>
+<a class="text-link" href="https://github.com/DreamerThatDeath/WIFI-PHANTOM">VIEW SOURCE CODE ↗</a>
 </section>
-<section class="columns">
-  <article class="panel">
-    <div class="heading"><div><small>NETWORK RADAR</small><h2>Nearby signals</h2></div><span class="pill">DEMO ON WEB</span></div>
-    <div id="networkList" class="network-list"><div class="empty">◎<p>Radar standing by.</p><small>Run a scan to load available network information.</small></div></div>
-    <div class="radar-actions"><button class="primary" id="scanBtn">⌕ SCAN WI-FI</button><button class="connect-action" id="disconnectBtn">DISCONNECT FROM WI-FI</button></div>
-    <div class="foot"><span>LIVE ANDROID / DEMO WEB</span><span id="scanTime">NO SCAN YET</span></div>
-  </article>
-  <article class="panel">
-    <div class="heading"><div><small>PHANTOM TERMINAL</small><h2>Simulation deck</h2></div><span class="pill green-pill">SAFE MODE</span></div>
-    <div id="terminal" class="terminal" aria-live="polite"><div class="muted">WIFI PHANTOM // SIMULATION CONSOLE</div><div class="muted">No network actions will be performed.</div><div>root@phantom:~$ <i class="cursor"></i></div></div>
-    <div class="actions"><button class="primary small" id="phantomBtn">▶ START PHANTOM</button><button class="secondary small" id="clearBtn">CLEAR</button></div>
-  </article>
-</section>
-<section class="tools">
-  <div class="heading"><div><small>QUICK ACCESS</small><h2>Network tools</h2></div><span class="sub">ONLY USE NETWORKS YOU OWN OR HAVE PERMISSION TO USE</span></div>
-  <div class="tool-grid">
-    <button class="tool" id="openSettings"><b>⌁ Wi-Fi settings</b><small>Connect using Android's trusted network picker.</small><em>OPEN SETTINGS ↗</em></button>
-    <button class="tool" id="routerBtn"><b>▦ Router dashboard</b><small>Open your router's local admin page. Address may vary.</small><em>OPEN ROUTER ↗</em></button>
-    <button class="tool" id="securityBtn"><b>⬡ Security checklist</b><small>Review safe settings for your home network.</small><em>VIEW CHECKLIST ↗</em></button>
-  </div>
-</section>
-<section class="panel checklist" id="checklist">
-  <div class="heading"><div><small>DEFENSIVE BASICS</small><h2>Home Wi-Fi checklist</h2></div><span class="pill">LOCAL GUIDE</span></div>
-  <ul><li>✓ Use WPA2-AES or WPA3 security when available.</li><li>✓ Set a unique router administrator password.</li><li>✓ Keep router firmware updated.</li><li>✓ Disable WPS if you do not need it.</li><li>✓ Use a guest network for visitors and smart devices.</li></ul>
-</section>
-<footer><span>WIFI PHANTOM ◆ BUILT FOR LEARNING</span><span>NO PASSWORD BYPASS · NO DISRUPTION</span></footer>
+<div class="download-disclaimer">WIFI PHANTOM does not bypass Wi-Fi passwords or access routers without permission. Secured network connections require valid credentials and Android approval. Live Wi-Fi scanning and connection controls are available in the Android app; this website is the download page.</div>
 </main>
-<div id="toast" class="toast" role="status"></div>
-<div id="passwordModal" class="modal" hidden><form id="passwordForm" class="modal-card"><div class="modal-kicker">SECURE NETWORK</div><h2 id="passwordTitle">Connect to Wi-Fi</h2><p id="passwordHint">Enter the network password. It is not saved.</p><label for="wifiPassword">WI-FI PASSWORD</label><input id="wifiPassword" type="password" autocomplete="off" maxlength="63" placeholder="Enter password"><label class="save-row"><input id="saveWifiPassword" type="checkbox"><span>Save password securely on this device</span></label><button type="button" class="saved-password" id="useSavedPassword" hidden>USE SAVED PASSWORD</button><div class="modal-actions"><button type="button" class="secondary" id="cancelConnect">CANCEL</button><button type="submit" class="primary" id="confirmConnect">CONNECT</button></div></form></div>
-<script src="./app.js?v=7" defer></script>
+<footer class="download-footer"><span>WIFI PHANTOM</span><span>MADE BY DREAMERTHATDEATH</span></footer>
+<script>
+if (window.AndroidWifi) location.replace("./app.html");
+if ("serviceWorker" in navigator) addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script>
 </body>
 </html>
