@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07120d">
 <meta name="description" content="WIFI PHANTOM network console.">
-<link rel="manifest" href="./manifest.webmanifest?v=8">
-<link rel="icon" href="./icon.svg?v=8">
+<link rel="manifest" href="./manifest.webmanifest?v=9">
+<link rel="icon" href="./icon.svg?v=9">
 <link rel="apple-touch-icon" href="./icon.svg">
-<link rel="stylesheet" href="./style.css?v=8">
+<link rel="stylesheet" href="./style.css?v=9">
 <title>WIFI PHANTOM | Network Console</title>
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="./"><img class="app-icon" src="./icon.svg?v=8" alt="WIFI PHANTOM app icon"><span>WIFI<span class="green">PHANTOM</span><small>WIRELESS CONTROL INTERFACE</small></span></a>
-  <div class="status"><i></i><span id="systemStatus">SYSTEM READY</span><button id="installBtn" hidden>INSTALL WEB APP</button></div>
+  <a class="brand" href="./"><img class="app-icon" src="./icon.svg?v=9" alt="WIFI PHANTOM app icon"><span>WIFI<span class="green">PHANTOM</span><small>WIRELESS CONTROL INTERFACE</small></span></a>
+  <div class="status"><i></i><span id="systemStatus">SYSTEM READY</span></div>
 </header>
 <main class="shell">
 <section class="hero">
@@ -24,15 +24,7 @@
   <div class="actions"><button class="secondary" id="wifiBtn">OPEN WI-FI SETTINGS ↗</button></div>
   <div class="notice">ⓘ <span><b>Choose the right version:</b> The website preview uses demo scan data. Install the Android APK for live Wi-Fi scanning and Android-approved connection controls. Websites cannot directly scan Wi-Fi radios.</span></div>
 </section>
-<section class="install-card" id="installCard">
-  <img src="./icon.svg?v=8" alt="WIFI PHANTOM app logo" class="install-logo">
-  <div class="install-copy"><span class="install-kicker">ANDROID APP · VERSION LATEST</span><h2>Take PHANTOM with you.</h2><p>Install the Android app to use live network scanning, password entry, optional encrypted password saving, connect requests, and disconnect controls.</p></div>
-  <div class="install-actions">
-    <a class="primary install-link" href="https://github.com/DreamerThatDeath/WIFI-PHANTOM/releases/latest/download/WIFI-PHANTOM.apk">↓ DOWNLOAD ANDROID APK</a>
-    <button class="secondary" id="installPwaBtn" hidden>＋ INSTALL WEB APP</button>
-  </div>
-  <small class="install-foot">Android will ask you to approve connections. Only connect to networks you own or have permission to use.</small>
-</section>
+
 <section class="stats">
   <article><small>VISIBLE NETWORKS</small><strong id="networkCount">--</strong><label>LIVE APP / DEMO WEB</label></article>
   <article><small>SECURITY CHECK</small><strong class="green">READY</strong><label>LOCAL EDUCATIONAL VIEW</label></article>
@@ -67,6 +59,6 @@
 </main>
 <div id="toast" class="toast" role="status"></div>
 <div id="passwordModal" class="modal" hidden><form id="passwordForm" class="modal-card"><div class="modal-kicker">SECURE NETWORK</div><h2 id="passwordTitle">Connect to Wi-Fi</h2><p id="passwordHint">Enter the network password. It is not saved.</p><label for="wifiPassword">WI-FI PASSWORD</label><input id="wifiPassword" type="password" autocomplete="off" maxlength="63" placeholder="Enter password"><label class="save-row"><input id="saveWifiPassword" type="checkbox"><span>Save password securely on this device</span></label><button type="button" class="saved-password" id="useSavedPassword" hidden>USE SAVED PASSWORD</button><div class="modal-actions"><button type="button" class="secondary" id="cancelConnect">CANCEL</button><button type="submit" class="primary" id="confirmConnect">CONNECT</button></div></form></div>
-<script src="./app.js?v=8" defer></script>
+<script src="./app.js?v=9" defer></script>
 </body>
 </html>
